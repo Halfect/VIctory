@@ -72,7 +72,8 @@ pub fn run(
 
     let images = cfg.cache_subdir("images")?;
     victory_hle::modules::d3d12x::use_shader_cache(cfg.cache_subdir("shaders")?);
-    let image = victory_loader::load(&prepared, &images)?;
+    let exe_name = exe.file_name().unwrap_or_default().to_string_lossy();
+    let image = victory_loader::load(&prepared, &images, &exe_name)?;
     victory_hle::runtime::set_main_image(image.base());
     victory_hle::runtime::set_image_path(image.base(), exe);
     println!(
@@ -162,7 +163,6 @@ pub fn run(
     for (name, dll) in &dlls {
         show(name, dll.bind_imports(&with_dlls, policy)?);
     }
-    let exe_name = exe.file_name().unwrap_or_default().to_string_lossy();
     show(&exe_name, image.bind_imports(&with_dlls, policy)?);
     if !execute {
         println!("not executing (pass --execute to start the title)");
